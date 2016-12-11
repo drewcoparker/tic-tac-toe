@@ -92,10 +92,12 @@ function computerMove(availSquaresArry) {
 
     if (computersPick) {
         document.getElementById(computersPick);
-        markSquare(computersPick);
+        console.log(computersPick);
+        markSquare(classSquare[computersPick]);
     } else {
         var rando = (Math.ceil(Math.random() * availSquaresArry.length) - 1);
         computersPick = availableSquares[rando];
+        console.log(computersPick);
         markSquare(classSquare[computersPick]);
     }
 }
