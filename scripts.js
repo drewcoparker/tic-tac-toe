@@ -13,7 +13,6 @@ var whosTurn = 1; //Initialize this to 1
 // homework: write a loop to set up the following winningCombos
 var player1Squares = [];
 var player2Squares = [];
-var computerSquares = [];
 var someoneWon = false;
 var availableSquares = ['A1', 'B1', 'C1', 'A2', 'B2', 'C2', 'A3', 'B3', 'C3'];
 
@@ -33,14 +32,13 @@ var winningCombos = [
 //     computerPlayer = true;
 // }
 
-var computerPlayer = true;
+var playingComputer = true;
 
 // mark the squares as x or o for players 1 and 2
 function markSquare(currentSquare) {
-    // console.log(square.id);
     if ((currentSquare.innerHTML === "X") || (currentSquare.innerHTML === "O")) {
         console.log("You cannot change this square now.");
-        return "taken";
+        // return "taken";
     } else if(someoneWon) {
         console.log("Someone already won.");
     } else {
@@ -50,7 +48,8 @@ function markSquare(currentSquare) {
             availableSquares.splice(availableSquares.indexOf(currentSquare.id), 1);
             whosTurn = 2;
             checkWin(player1Squares, "Player 1");
-            if (computerPlayer) {
+
+            if (playingComputer) {
                 computerMove(availableSquares);
             }
         } else {
@@ -64,29 +63,49 @@ function markSquare(currentSquare) {
     }
 }
 
+function goForWin(){
+
+}
+
+
+function blockMove(playerSquares) {
+    var blockingMove;
+    for (let i = 0; i < winningCombos.length; i++) {
+        var matchCount = 0;
+        for (let j = 0; j < winningCombos[i].length; j++) {
+            var matchingSquare = winningCombos[i][j];
+            if (playerSquares.indexOf(matchingSquare) !== -1) {
+                matchCount++;
+            }
+            if (matchCount > 1) {
+                blockingMove = winningCombos[i][j+1];
+                return blockingMove;
+            }
+        }
+    }
+    return false;
+}
+
 function computerMove(availSquaresArry) {
-    // find a square to mark
-    // var availableSquares = getElementsByClassName('square');
-    // var randomSquare = availableSquares[Math.ceil(Math.random() * 8) + 1];
-    // markSquare(randomSquare);
+    var classSquare = document.getElementsByClassName('square');
+    var computersPick = blockMove(player1Squares);
 
-
-    // var computersPick = availSquaresArry[Math.floor(Math.random() * availSquaresArry.length - 1)];
-    var needASquare = true;
-    var squareBtns = document.getElementsByClassName('square');
-    while(needASquare) {
-        var rando = (Math.ceil(Math.random() * availSquaresArry.length));
-        var randomSquare = squareBtns[rando];
-        isTaken = markSquare(randomSquare);
+    if (computersPick) {
+        document.getElementById(computersPick);
+        markSquare(computersPick);
+    } else {
+        var rando = (Math.ceil(Math.random() * availSquaresArry.length) - 1);
+        computersPick = availableSquares[rando];
+        markSquare(classSquare[computersPick]);
     }
 }
 
 
 // see if we have a winner
 function checkWin(playerSquares, player) {
-    for (var i = 0; i < winningCombos.length; i++) {
+    for (let i = 0; i < winningCombos.length; i++) {
         var matchCount = 0;
-        for (var j = 0; j < winningCombos[i].length; j++) {
+        for (let j = 0; j < winningCombos[i].length; j++) {
             var matchingSquare = winningCombos[i][j];
             if (playerSquares.indexOf(matchingSquare) !== -1) {
                 // hit! player has this square somewhere
@@ -121,3 +140,7 @@ function gameIsWon(whoWon, winningCombo) {
 // reset players squares to empty arrays
 // someoneWon needs to get reset to false
 // reset the dom back to uncolored and not marked
+function reset() {
+    someoneWon = false;
+
+}
