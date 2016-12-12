@@ -63,14 +63,21 @@ function goForWin(){
     var winningMove;
     for (let i = 0; i < winningCombos.length; i++) {
         var matchCount = 0;
-        for (let j = 0; j < winningCombos[i].length; j++) {
-            var matchingSquare = winningCombos[i][j];
+        var winningRow = winningCombos[i];
+        for (let j = 0; j < winningRow.length; j++) {
+            var matchingSquare = winningRow[j];
             if (player2Squares.indexOf(matchingSquare) !== -1) {
                 matchCount++;
             }
             if (matchCount === 2) {
-                winningMove = winningCombos[i][j+1];
-                return winningMove;
+                for (let i = 0; i < winningRow.length; i++) {
+                    if ((player2Squares.indexOf(winningRow[i]) === -1) &&
+                        (availableSquares.indexOf(winningRow[i]) !== -1)
+                    ){
+                        winningMove = winningRow[i];
+                        return winningMove;
+                    }
+                }
             }
         }
     }
