@@ -1,13 +1,6 @@
 
 
-// 1. set up board
-// 2. user should be able to click a box and a mark shows up.
-// --put an onclick in the first square
-// --when user clicks, call function that upts an x in the box.
-// 4. we need to keep track of whos turn it is
-// 5. when a square is clicked, put the symbol in and change whos turn it is
-// 6. keep player from overriding square
-// 7. we need a win checker
+
 
 var whosTurn = 1; //Initialize this to 1
 // homework: write a loop to set up the following winningCombos
@@ -50,60 +43,95 @@ function markSquare(currentSquare) {
             checkWin(player1Squares, "Player 1");
 
             if (playingComputer) {
-                computerMove(availableSquares);
+                computerMove();
             }
         } else {
             currentSquare.innerHTML = "O";
             player2Squares.push(currentSquare.id);
             availableSquares.splice(availableSquares.indexOf(currentSquare.id), 1);
-            console.log(availableSquares);
             whosTurn = 1;
             checkWin(player2Squares, "Player 2");
         }
     }
 }
 
+//***********************************
+//****Computer logic functions*******
+//***********************************
+
 function goForWin(){
-
-}
-
-
-function blockMove(playerSquares) {
-    var blockingMove;
+    var winningMove;
     for (let i = 0; i < winningCombos.length; i++) {
         var matchCount = 0;
         for (let j = 0; j < winningCombos[i].length; j++) {
             var matchingSquare = winningCombos[i][j];
-            if (playerSquares.indexOf(matchingSquare) !== -1) {
+            if (player2Squares.indexOf(matchingSquare) !== -1) {
                 matchCount++;
             }
-            if (matchCount > 1) {
-                blockingMove = winningCombos[i][j+1];
-                return blockingMove;
+            if (matchCount === 2) {
+                winningMove = winningCombos[i][j+1];
+                return winningMove;
             }
         }
     }
     return false;
 }
 
-function computerMove(availSquaresArry) {
-    var classSquare = document.getElementsByClassName('square');
-    var computersPick = blockMove(player1Squares);
 
-    if (computersPick) {
-        document.getElementById(computersPick);
-        console.log(computersPick);
-        markSquare(classSquare[computersPick]);
+function blockMove() {
+    var blockingMove;
+    for (let i = 0; i < winningCombos.length; i++) {
+        var matchCount = 0;
+        var winningRow = winningCombos[i];
+        for (let j = 0; j < winningRow.length; j++) {
+            var matchingSquare = winningRow[j];
+            if (player1Squares.indexOf(matchingSquare) !== -1) {
+                matchCount++;
+            }
+            //We have two out of three of a winning combo.
+            //Loop through the row that would be a win and find a square to
+            //block victory.
+            if (matchCount === 2) {
+                for (let i = 0; i < winningRow.length; i++) {
+                    if ((player1Squares.indexOf(winningRow[i]) === -1) &&
+                        (availableSquares.indexOf(winningRow[i]) !== -1)
+                    ){
+                        blockingMove = winningRow[i];
+                        return blockingMove;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+
+function computerMove() {
+    var classSquare = document.getElementsByClassName('square');
+    if (player2Squares.length > 0) {
+        var winningPick = goForWin(player2Squares);
+    }
+    var blockingPick = blockMove(player1Squares);
+
+    if (winningPick) {
+        document.getElementById(winningPick);
+        markSquare(classSquare[winningPick]);
+    } else if (blockingPick) {
+        document.getElementById(blockingPick);
+        markSquare(classSquare[blockingPick]);
     } else {
-        var rando = (Math.ceil(Math.random() * availSquaresArry.length) - 1);
-        computersPick = availableSquares[rando];
-        console.log(computersPick);
+        var rando = (Math.ceil(Math.random() * availableSquares.length) - 1);
+        var computersPick = availableSquares[rando];
         markSquare(classSquare[computersPick]);
     }
 }
 
 
-// see if we have a winner
+//********************************************
+// ****Check to see if we have a winner*******
+//********************************************
+
 function checkWin(playerSquares, player) {
     for (let i = 0; i < winningCombos.length; i++) {
         var matchCount = 0;
@@ -123,8 +151,6 @@ function checkWin(playerSquares, player) {
         }
     }
 }
-
-
 
 
 // color the player's winning squares, stop the game, and ask to play again
